@@ -1,6 +1,7 @@
 import os
 import random
 import logging
+import sys
 
 from django.conf import settings
 from json_dict import JsonDict
@@ -11,9 +12,9 @@ preamble = ""
 if len(__name__.split(".")) == 2:
     from manage import logger,CONFIG
 else:
-    from ..manage import logger,CONFIG
     preamble = __name__.replace(".plug_in_django.settings",".")
-
+    from ..manage import logger,CONFIG
+DJANGO_DIR = os.path.dirname(os.path.dirname(__file__))
 BASE_DIR = os.path.join(expanduser("~"), ".plug_in_django")
 os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -83,12 +84,12 @@ if CONFIG.get("django_settings", "apps", "load_defaults", default=True):
         'bootstrap4',
     ]
 
-INSTALLED_APPS += CONFIG.get("django_settings", "apps", "additional", default=[])
+INSTALLED_APPS += list(set(CONFIG.get("django_settings", "apps", "additional", default=[])))
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")] + CONFIG.get(
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"),os.path.join(DJANGO_DIR,"static")] + CONFIG.get(
     "django_settings", "static_files", "dirs", default=[]
 )
-
+print(STATICFILES_DIRS)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -98,16 +99,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "global_login_required.GlobalLoginRequiredMiddleware",
 ]
-
-PUBLIC_PATHS = [r"^/accounts/.*"]  # allow public access to all django-allauth views
-ROOT_URLCONF = preamble + "controll_server.urls"
+ROOT_URLCONF = preamble + "plug_in_django.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "DIRS": [os.path.join(BASE_DIR, "templates"),os.path.join(DJANGO_DIR,"templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -122,7 +120,7 @@ TEMPLATES = [
     }
 ]
 
-WSGI_APPLICATION = preamble + "controll_server.wsgi.application"
+WSGI_APPLICATION = preamble + "plug_in_django.wsgi.application"
 
 
 # Database
@@ -134,7 +132,7 @@ DATABASES = {
             "django_settings",
             "database",
             "name",
-            default=os.path.abspath(os.path.join(os.path.dirname(CONFIG.file), "db.sqlite3")),
+            default=os.path.join(BASE_DIR, "db.sqlite3"),
         )
     }
 }
@@ -150,3 +148,27 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+
+thismodule = sys.modules[__name__]
+for attr,values in CONFIG.get("django_settings", "manual", "add_to_list",default={}).items():
+    setattr(thismodule, attr,
+    list(getattr(thismodule, attr,[]))+values
+    )
+
+for attr,values in CONFIG.get("django_settings", "manual", "set",default={}).items():
+    setattr(thismodule, attr,values)
+
+
+if CONFIG.get("django_settings", "apps","channels",default=False):
+    INSTALLED_APPS.insert(0,'channels')
+    ASGI_APPLICATION = preamble + "plug_in_django.routing.application"
+    #if len(__name__.split(".")) == 2:
+    #    from plug_in_django.routing import application
+    #else:
+        #from .routing import application
+else:
+    if len(__name__.split(".")) == 2:
+        from plug_in_django.wsgi import application
+    else:
+        from .wsgi import application

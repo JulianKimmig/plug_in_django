@@ -11,6 +11,11 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_arduino_controller.settings')
+if len(__name__.split(".")) == 2:
+    from plug_in_django.settings import preamble
+else:
+    from .settings import preamble
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', preamble+'plug_in_django.settings')
 
 application = get_wsgi_application()

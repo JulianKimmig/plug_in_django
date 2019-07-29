@@ -14,8 +14,38 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.views.generic import TemplateView
+
+if len(__name__.split(".")) == 2:
+    from templatetags.installed_apps import get_apps
+    from .manage import logger
+else:
+    from ..templatetags.installed_apps import get_apps
+    from ..manage import logger
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', TemplateView.as_view(template_name='plug_in_django_index.html')),
+    path('accounts/', include(('django.contrib.auth.urls',"auth"),namespace="accounts")),
 ]
+
+for app in get_apps():
+    try:
+        if hasattr(app, "baseurl"):
+            urlpatterns.insert(0,
+                path(
+                    app.baseurl + ("/" if len(app.baseurl) > 0 else ""),
+                    include(
+                        ("%s.urls" % app.module_path, app.label), namespace=app.label
+                    ),
+                    )
+            )
+            logger.info("load app: "+app.label)
+
+    except ModuleNotFoundError as e:
+        logger.exception(e)
+    except Exception as e:
+        logger.exception(e)
+
+print(urlpatterns)

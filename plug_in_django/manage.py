@@ -4,6 +4,8 @@ import os
 import sys
 import logging
 
+from json_dict import JsonDict
+
 logger = logging.getLogger("plug_in_django")
 CONFIG = None
 
@@ -43,6 +45,26 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
     execute_from_command_line(sys.argv)
+
+def plug_in(appconfig,config=None):
+    #plugin app
+    global CONFIG
+    if CONFIG is None:
+        if config is not None:
+           CONFIG = config.getsubdict(preamble=['plug_in_django_server'])
+        else:
+            CONFIG = JsonDict(os.path.join(os.path.join(os.path.expanduser("~"), ".plug_in_django_server"), "plug_in_django_server_config.json"))
+
+    if config is not None:
+        appconfig.config = config.getsubdict(preamble=[appconfig.name])
+    else:
+        if appconfig.config is None:
+            appconfig.config = CONFIG.getsubdict(preamble=[appconfig.name])
+    logger.info("plug in {} with the config-path:'{}'".format(appconfig.name,appconfig.config.file))
+
+    apps = CONFIG.get("django_settings", "apps", "additional", default=[])
+    apps.append(appconfig.name)
+    CONFIG.put("django_settings", "apps", "additional", value=list(set(apps)))
 
 
 if __name__ == '__main__':
