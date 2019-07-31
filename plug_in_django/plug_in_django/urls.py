@@ -25,23 +25,26 @@ else:
     from ..manage import logger
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='plug_in_django_index.html')),
-    path('accounts/', include(('django.contrib.auth.urls',"auth"),namespace="accounts")),
+    path("admin/", admin.site.urls),
+    path("", TemplateView.as_view(template_name="plug_in_django_index.html")),
+    path(
+        "accounts/", include(("django.contrib.auth.urls", "auth"), namespace="accounts")
+    ),
 ]
 
 for app in get_apps():
     try:
         if hasattr(app, "baseurl"):
-            urlpatterns.insert(0,
+            urlpatterns.insert(
+                0,
                 path(
                     app.baseurl + ("/" if len(app.baseurl) > 0 else ""),
                     include(
                         ("%s.urls" % app.module_path, app.label), namespace=app.label
                     ),
-                    )
+                ),
             )
-            logger.info("load app: "+app.label)
+            logger.info("load app: " + app.label)
 
     except ModuleNotFoundError as e:
         logger.exception(e)

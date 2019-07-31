@@ -1,11 +1,10 @@
 from django import template
 
-#if manage.py is called directly
+# if manage.py is called directly
 if len(__name__.split(".")) == 2:
     from plug_in_django.settings import CONFIG
 else:
     from ..plug_in_django.settings import CONFIG
-
 
 
 register = template.Library()

@@ -16,6 +16,6 @@ if len(__name__.split(".")) == 2:
 else:
     from .settings import preamble
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', preamble+'plug_in_django.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", preamble + "plug_in_django.settings")
 
 application = get_wsgi_application()

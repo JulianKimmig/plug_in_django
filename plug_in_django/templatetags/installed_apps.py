@@ -35,7 +35,11 @@ def get_apps_context(request):
                             "in_nav_bar": (
                                 app.in_nav_bar if hasattr(app, "in_nav_bar") else False
                             ),
-                            "navbarhtml":(app.in_nav_bar_html if hasattr(app, "in_nav_bar_html") else False),
+                            "navbarhtml": (
+                                app.in_nav_bar_html
+                                if hasattr(app, "in_nav_bar_html")
+                                else False
+                            ),
                             "verbose_name": app.verbose_name,
                         }
                     )
@@ -45,6 +49,4 @@ def get_apps_context(request):
             apps_in_nav = True
             break
 
-    return {"apps": CONTEXTAPPS,
-            'apps_in_nav':apps_in_nav
-            }
+    return {"apps": CONTEXTAPPS, "apps_in_nav": apps_in_nav}
