@@ -88,6 +88,7 @@ if CONFIG.get("django_settings", "apps", "load_defaults", default=True):
         "django.contrib.messages",
         "django.contrib.staticfiles",
         "bootstrap4",
+        "sekizai",
     ]
 
 INSTALLED_APPS += list(
@@ -125,6 +126,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "sekizai.context_processors.sekizai",
                 preamble + "templatetags.installed_apps.get_apps_context",
             ],
             "libraries": {"public_dict": preamble + "templatetags.public_dict"},

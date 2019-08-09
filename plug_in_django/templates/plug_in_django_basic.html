@@ -1,5 +1,6 @@
 {% load static %}
 {% load public_dict %}
+{% load sekizai_tags %}
 <!DOCTYPE html>
 <html lang={{"language_time,language_code"|pub_dict:"en" }}>
 <head>
@@ -9,8 +10,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'basic.css' %}">
-    {% block stylesheets %}
+    {% block stylesheet%}
     {% endblock %}
+    {% render_block "css" %}
     <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
 
 
@@ -70,37 +72,40 @@
     </ul>
 </nav>
 
+{% addtoblock "jss" %}
+    <script
+            src="https://code.jquery.com/jquery-3.4.0.min.js"
+            integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script>
+        $('.dropdown-submenu > a').on("click", function (e) {
+            var submenu = $(this);
+            $('.dropdown-submenu .dropdown-menu').removeClass('show');
+            submenu.next('.dropdown-menu').addClass('show');
+            e.stopPropagation();
+        });
+
+        $('.dropdown').on("hidden.bs.dropdown", function () {
+            // hide any open menus when parent closes
+            $('.dropdown-menu.show').removeClass('show');
+        });
+    </script>
+{% endaddtoblock %}
 
 <div id="contend-body" class="container-fluid">
     {% block contend %}
     {% endblock %}
 </div>
-
-<script
-        src="https://code.jquery.com/jquery-3.4.0.min.js"
-        integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-<script>
-    $('.dropdown-submenu > a').on("click", function (e) {
-        var submenu = $(this);
-        $('.dropdown-submenu .dropdown-menu').removeClass('show');
-        submenu.next('.dropdown-menu').addClass('show');
-        e.stopPropagation();
-    });
-
-    $('.dropdown').on("hidden.bs.dropdown", function () {
-        // hide any open menus when parent closes
-        $('.dropdown-menu.show').removeClass('show');
-    });
-</script>
-{% block javascript %}
+{% block javascript%}
 {% endblock %}
+{% render_block "jss" %}
+
 
 </body>
 </html>
