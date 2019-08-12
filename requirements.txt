@@ -1,5 +1,5 @@
 Django
-bootstrap4
+django-bootstrap4
 django-glrm
 Json-Dict
 channels

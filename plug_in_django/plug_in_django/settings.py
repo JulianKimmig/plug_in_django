@@ -14,6 +14,7 @@ if len(__name__.split(".")) == 2:
 else:
     preamble = __name__.replace(".plug_in_django.settings", ".")
     from ..manage import logger, CONFIG
+
 DJANGO_DIR = os.path.dirname(os.path.dirname(__file__))
 BASE_DIR = os.path.join(expanduser("~"), ".plug_in_django")
 os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

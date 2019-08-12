@@ -13,6 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
@@ -33,17 +36,25 @@ for app in get_apps():
     try:
         if hasattr(app, "baseurl"):
             if app.name in apps:
-                app.baseurl = apps[app.name]["baseurl"]
+                app.baseurl = apps[app.name].get("baseurl",getattr(app,"baseurl",app.name))
+                app.data_dir = apps[app.name].get("data_dir",getattr(app,"data_dir",False))
+
+            if app.data_dir is True:
+                app.data_dir = os.path.join(os.path.dirname(CONFIG.get("django_settings","BASE_DIR")),"{}_data".format(app.name))
+            if app.data_dir:
+                app.data_dir_url = "/"+app.baseurl + ("/" if len(app.baseurl) > 0 else "")+"{}_data".format(app.name)
+                urlpatterns.extend(static(app.data_dir_url, document_root=app.data_dir))
+
             urlpatterns.insert(
-                0,
-                path(
-                    app.baseurl + ("/" if len(app.baseurl) > 0 else ""),
-                    include(
-                        ("%s.urls" % app.module_path, app.label), namespace=app.label
-                    ),
+            0,
+            path(
+                app.baseurl + ("/" if len(app.baseurl) > 0 else ""),
+                include(
+                    ("%s.urls" % app.module_path, app.label), namespace=app.label
                 ),
-            )
-            logger.info("load app: " + app.label)
+            ),
+        )
+        logger.info("load app: " + app.label)
 
     except ModuleNotFoundError as e:
         logger.exception(e)
