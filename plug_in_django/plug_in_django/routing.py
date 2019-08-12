@@ -50,7 +50,7 @@ for app in get_apps():
     except Exception as e:
         logger.exception(e)
 
-print(websocket_urlpatterns)
+
 application = ProtocolTypeRouter(
     {
         # (http->django views is added by default)

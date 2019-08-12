@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 
+from plug_in_django.plug_in_django.settings import CONFIG
+
 if len(__name__.split(".")) == 2:
     from templatetags.installed_apps import get_apps
     from .manage import logger
@@ -24,17 +26,14 @@ else:
     from ..templatetags.installed_apps import get_apps
     from ..manage import logger
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", TemplateView.as_view(template_name="plug_in_django_index.html")),
-    path(
-        "accounts/", include(("django.contrib.auth.urls", "auth"), namespace="accounts")
-    ),
-]
+urlpatterns = []
 
 for app in get_apps():
+    apps = CONFIG.get("django_settings", "apps", "additional", default={})
     try:
         if hasattr(app, "baseurl"):
+            if app.name in apps:
+                app.baseurl = apps[app.name]["baseurl"]
             urlpatterns.insert(
                 0,
                 path(
@@ -51,4 +50,11 @@ for app in get_apps():
     except Exception as e:
         logger.exception(e)
 
-print(urlpatterns)
+urlpatterns.extend(
+    [path("admin/", admin.site.urls),
+     path("", TemplateView.as_view(template_name="plug_in_django_index.html")),
+     path(
+         "accounts/", include(("django.contrib.auth.urls", "auth"), namespace="accounts")
+     ),]
+)
+#print(urlpatterns)

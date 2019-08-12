@@ -73,9 +73,16 @@ def plug_in(appconfig, config=None):
         )
     )
 
-    apps = CONFIG.get("django_settings", "apps", "additional", default=[])
-    apps.append(appconfig.name)
-    CONFIG.put("django_settings", "apps", "additional", value=list(set(apps)))
+    if not hasattr(appconfig,"baseurl"):
+        setattr(appconfig,"baseurl",getattr(appconfig,"name"))
+
+    apps = CONFIG.get("django_settings", "apps", "additional", default={})
+    apps[appconfig.name]={
+        'name':getattr(appconfig,"name"),
+        'baseurl':getattr(appconfig,"baseurl")
+    }
+    CONFIG.put("django_settings", "apps", "additional", value=apps)
+    CONFIG.save()
 
 
 if __name__ == "__main__":

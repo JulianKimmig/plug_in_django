@@ -21,7 +21,6 @@ os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if CONFIG is None:
     os.makedirs(BASE_DIR, exist_ok=True)
     CONFIG = JsonDict(os.path.join(BASE_DIR, "serverconfig.json"))
-
 BASE_DIR = CONFIG.get("django_settings", "BASE_DIR", default=BASE_DIR)
 if CONFIG.get("django_settings", "public_list", "settings", "BASE_DIR", default=False):
     CONFIG.put("public", "settings", "BASE_DIR", value=BASE_DIR)
@@ -92,14 +91,14 @@ if CONFIG.get("django_settings", "apps", "load_defaults", default=True):
     ]
 
 INSTALLED_APPS += list(
-    set(CONFIG.get("django_settings", "apps", "additional", default=[]))
+    CONFIG.get("django_settings", "apps", "additional", default={}).keys()
 )
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     os.path.join(DJANGO_DIR, "static"),
 ] + CONFIG.get("django_settings", "static_files", "dirs", default=[])
-print(STATICFILES_DIRS)
+#print(STATICFILES_DIRS)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
