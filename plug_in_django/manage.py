@@ -84,7 +84,6 @@ def plug_in(appconfig, config=None):
         appconfig.data_dir=False
 
 
-    print(appconfig.data_dir)
     apps[appconfig.name]={
         'name':appconfig.name,
         'baseurl':getattr(appconfig,"baseurl"),
