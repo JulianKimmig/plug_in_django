@@ -73,24 +73,30 @@ def plug_in(appconfig, config=None):
         )
     )
 
-    if not hasattr(appconfig,"baseurl"):
-        setattr(appconfig,"baseurl",getattr(appconfig,"name"))
+    if not hasattr(appconfig, "baseurl"):
+        setattr(appconfig, "baseurl", getattr(appconfig, "name"))
 
     apps = CONFIG.get("django_settings", "apps", "additional", default={})
-    if getattr(appconfig,"data_dir",False) is True:
-        appconfig.data_dir=os.path.join(os.path.dirname(CONFIG.file),"{}_data".format(appconfig.name))
-        appconfig.data_dir_url = "/" + appconfig.baseurl + ("/" if len(appconfig.baseurl) > 0 else "")+"{}_data".format(appconfig.name)
+    if getattr(appconfig, "data_dir", False) is True:
+        appconfig.data_dir = os.path.join(
+            os.path.dirname(CONFIG.file), "{}_data".format(appconfig.name)
+        )
+        appconfig.data_dir_url = (
+            "/"
+            + appconfig.baseurl
+            + ("/" if len(appconfig.baseurl) > 0 else "")
+            + "{}_data".format(appconfig.name)
+        )
     else:
-        appconfig.data_dir=False
+        appconfig.data_dir = False
 
-
-    apps[appconfig.name]={
-        'name':appconfig.name,
-        'baseurl':getattr(appconfig,"baseurl"),
-        'data_dir': appconfig.data_dir
+    apps[appconfig.name] = {
+        "name": appconfig.name,
+        "baseurl": getattr(appconfig, "baseurl"),
+        "data_dir": appconfig.data_dir,
     }
     if appconfig.data_dir is not False:
-        os.makedirs(appconfig.data_dir,exist_ok=True)
+        os.makedirs(appconfig.data_dir, exist_ok=True)
 
     CONFIG.put("django_settings", "apps", "additional", value=apps)
     CONFIG.save()

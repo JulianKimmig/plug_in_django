@@ -99,7 +99,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     os.path.join(DJANGO_DIR, "static"),
 ] + CONFIG.get("django_settings", "static_files", "dirs", default=[])
-#print(STATICFILES_DIRS)
+# print(STATICFILES_DIRS)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
